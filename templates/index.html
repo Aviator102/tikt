@@ -62,8 +62,9 @@
             border: 1px solid #ddd;
             overflow-wrap: break-word;
             word-wrap: break-word;
-            height: 200px; /* Fixa a altura da área de descrição */
-            overflow-y: auto; /* Permite rolar se necessário */
+            height: 200px;
+            overflow-y: auto;
+            text-align: left;
         }
 
         .download-btn {
@@ -150,12 +151,11 @@
             const downloadBtn = document.getElementById("download-btn");
             const copyBtn = document.getElementById("copy-btn");
 
-            // Limpa os dados anteriores antes de processar novos
             videoDetails.textContent = '';
             downloadBtn.classList.add("hidden");
             copyBtn.classList.add("hidden");
 
-            infoContainer.classList.add("hidden"); // Esconde a área de resultados
+            infoContainer.classList.add("hidden");
 
             try {
                 const response = await fetch("/api/tiktok", {
@@ -167,7 +167,6 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Exibe apenas a descrição se estiver presente
                     const description = data.description || "Descrição não disponível.";
                     videoDetails.textContent = `Descrição: ${description}`;
 
@@ -189,7 +188,7 @@
                         alert("Erro ao acessar o link do vídeo para o download.");
                     }
 
-                    infoContainer.classList.remove("hidden"); // Exibe os detalhes do vídeo
+                    infoContainer.classList.remove("hidden");
                 } else {
                     alert("Erro: " + data.error);
                 }
@@ -205,10 +204,9 @@
             }
         });
 
-        // Função para copiar apenas a descrição
         document.getElementById("copy-btn").addEventListener("click", function () {
             const videoDetails = document.getElementById("video-details");
-            const descriptionText = videoDetails.textContent.split('\n')[0];  // Pega apenas a linha da descrição
+            const descriptionText = videoDetails.textContent.split('\n')[0];
 
             navigator.clipboard.writeText(descriptionText).then(() => {
                 alert("Descrição copiada para a área de transferência!");
