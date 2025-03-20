@@ -61,6 +61,9 @@
             background-color: #f9f9f9;
             border: 1px solid #ddd;
             overflow-wrap: break-word;
+            word-wrap: break-word;
+            height: 200px; /* Fixa a altura da área de descrição */
+            overflow-y: auto; /* Permite rolar se necessário */
         }
 
         .download-btn {
@@ -147,9 +150,12 @@
             const downloadBtn = document.getElementById("download-btn");
             const copyBtn = document.getElementById("copy-btn");
 
-            infoContainer.classList.add("hidden");
+            // Limpa os dados anteriores antes de processar novos
+            videoDetails.textContent = '';
             downloadBtn.classList.add("hidden");
             copyBtn.classList.add("hidden");
+
+            infoContainer.classList.add("hidden"); // Esconde a área de resultados
 
             try {
                 const response = await fetch("/api/tiktok", {
@@ -187,7 +193,7 @@
                         alert("Erro ao acessar o link do vídeo para o download.");
                     }
 
-                    infoContainer.classList.remove("hidden");
+                    infoContainer.classList.remove("hidden"); // Exibe os detalhes do vídeo
                 } else {
                     alert("Erro: " + data.error);
                 }
@@ -206,9 +212,9 @@
         // Função para copiar a descrição
         document.getElementById("copy-btn").addEventListener("click", function () {
             const videoDetails = document.getElementById("video-details");
-            const textToCopy = videoDetails.textContent;
+            const descriptionText = videoDetails.textContent.split('\n')[1];  // Pega apenas a linha da descrição
 
-            navigator.clipboard.writeText(textToCopy).then(() => {
+            navigator.clipboard.writeText(descriptionText).then(() => {
                 alert("Descrição copiada para a área de transferência!");
             }, () => {
                 alert("Falha ao copiar a descrição.");
