@@ -118,6 +118,7 @@
             downloadBtn.classList.add("hidden");
 
             try {
+                // Requisição para pegar o 'videoUrl' do TikTok
                 const response = await fetch("/api/tiktok", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -127,15 +128,29 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Formatar os detalhes recebidos para exibir
-                    const formattedDetails = JSON.stringify(data, null, 2); // Usando JSON.stringify para formatar
-
+                    // Exibe os detalhes do vídeo
+                    const formattedDetails = `
+                    Título: ${data.title}
+                    Descrição: ${data.description}
+                    Duração: ${data.duration}
+                    Qualidade: ${data.quality}
+                    URL do Vídeo: ${data.videoUrl}
+                    `;
                     videoDetails.textContent = formattedDetails;
 
-                    // Mostrar o botão de download
-                    downloadBtn.href = data.fileUrl; // URL do vídeo com o token
-                    downloadBtn.download = "video_tiktok.mp4"; // Nome padrão para o arquivo
-                    downloadBtn.classList.remove("hidden");
+                    // Agora que temos o `videoUrl`, fazemos outra requisição para obter o `fileUrl`
+                    const videoResponse = await fetch(data.videoUrl);
+                    const videoData = await videoResponse.json();
+
+                    if (videoResponse.ok) {
+                        // Exibe o link de download
+                        const fileUrl = videoData.fileUrl;
+                        downloadBtn.href = fileUrl;
+                        downloadBtn.download = videoData.fileName; // Nome do arquivo
+                        downloadBtn.classList.remove("hidden");
+                    } else {
+                        alert("Erro ao acessar o link do vídeo para o download.");
+                    }
 
                     infoContainer.classList.remove("hidden");
                 } else {
