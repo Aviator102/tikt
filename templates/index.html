@@ -43,10 +43,6 @@
             border-radius: 5px;
         }
 
-        .hidden {
-            display: none;
-        }
-
         .info-container {
             margin-top: 20px;
             padding: 20px;
@@ -65,6 +61,7 @@
             height: 200px;
             overflow-y: auto;
             text-align: left;
+            display: none;
         }
 
         .download-btn {
@@ -135,7 +132,7 @@
         <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
     </div>
 
-    <div id="info-container" class="info-container hidden">
+    <div id="info-container" class="info-container">
         <h2>Descrição do Vídeo</h2>
         <pre id="video-details"></pre>
         <a id="download-btn" class="download-btn hidden" download>Baixar Vídeo</a>
@@ -155,7 +152,7 @@
             downloadBtn.classList.add("hidden");
             copyBtn.classList.add("hidden");
 
-            infoContainer.classList.add("hidden");
+            infoContainer.style.display = 'none';
 
             try {
                 const response = await fetch("/api/tiktok", {
@@ -188,7 +185,7 @@
                         alert("Erro ao acessar o link do vídeo para o download.");
                     }
 
-                    infoContainer.classList.remove("hidden");
+                    infoContainer.style.display = 'block';
                 } else {
                     alert("Erro: " + data.error);
                 }
