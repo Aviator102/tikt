@@ -128,13 +128,13 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Exibe os detalhes do vídeo
+                    // Exibe os detalhes do vídeo, mas sem a URL do vídeo
                     const formattedDetails = `
                     Título: ${data.title}
                     Descrição: ${data.description}
                     Duração: ${data.duration}
                     Qualidade: ${data.quality}
-                    URL do Vídeo: ${data.videoUrl}
+                    Tamanho: ${data.fileSize}
                     `;
                     videoDetails.textContent = formattedDetails;
 
