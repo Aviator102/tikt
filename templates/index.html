@@ -52,16 +52,11 @@
             text-align: left;
             max-width: 100%;
             margin: auto;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
-            overflow-wrap: break-word;
             word-wrap: break-word;
-            height: 200px;
-            overflow-y: auto;
-            text-align: left;
-            display: none;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
         }
 
         .download-btn {
@@ -132,7 +127,7 @@
         <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
     </div>
 
-    <div id="info-container" class="info-container">
+    <div id="info-container" class="info-container" style="display: none;">
         <h2>Descrição do Vídeo</h2>
         <pre id="video-details"></pre>
         <a id="download-btn" class="download-btn hidden" download>Baixar Vídeo</a>
