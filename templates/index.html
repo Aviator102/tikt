@@ -66,10 +66,10 @@
             text-align: left;
             max-width: 500px;
             margin: auto;
-        }
-
-        .info-container p {
-            margin: 5px 0;
+            white-space: pre-wrap; /* Preserve spacing and newlines */
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
         }
 
         .download-btn {
@@ -99,13 +99,10 @@
         </form>
     </div>
 
-    <!-- Informações do vídeo -->
+    <!-- Exibição dos detalhes -->
     <div id="info-container" class="info-container hidden">
-        <h2>Detalhes do Vídeo</h2>
-        <p><strong>Tamanho:</strong> <span id="fileSize"></span></p>
-        <p><strong>Nome do Arquivo:</strong> <span id="fileName"></span></p>
-        <p><strong>Status:</strong> <span id="percent"></span></p>
-        <br>
+        <h2>Dados do Vídeo</h2>
+        <pre id="video-details"></pre>
         <a id="download-btn" class="download-btn hidden">Baixar Vídeo</a>
     </div>
 
@@ -114,9 +111,7 @@
             event.preventDefault();
             const url = document.getElementById("url").value;
             const infoContainer = document.getElementById("info-container");
-            const fileSize = document.getElementById("fileSize");
-            const fileName = document.getElementById("fileName");
-            const percent = document.getElementById("percent");
+            const videoDetails = document.getElementById("video-details");
             const downloadBtn = document.getElementById("download-btn");
 
             infoContainer.classList.add("hidden");
@@ -132,13 +127,14 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    fileSize.textContent = data.fileSize;
-                    fileName.textContent = data.fileName;
-                    percent.textContent = data.percent;
-                    
-                    // Configura o botão de download corretamente
-                    downloadBtn.href = data.fileUrl; // URL do vídeo
-                    downloadBtn.download = data.fileName; // Nome correto do arquivo
+                    // Formatar os detalhes recebidos para exibir
+                    const formattedDetails = JSON.stringify(data, null, 2); // Usando JSON.stringify para formatar
+
+                    videoDetails.textContent = formattedDetails;
+
+                    // Mostrar o botão de download
+                    downloadBtn.href = data.fileUrl; // URL do vídeo com o token
+                    downloadBtn.download = "video_tiktok.mp4"; // Nome padrão para o arquivo
                     downloadBtn.classList.remove("hidden");
 
                     infoContainer.classList.remove("hidden");
