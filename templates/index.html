@@ -135,7 +135,7 @@
     </div>
 
     <div id="info-container" class="info-container hidden">
-        <h2>Dados do Vídeo</h2>
+        <h2>Descrição do Vídeo</h2>
         <pre id="video-details"></pre>
         <a id="download-btn" class="download-btn hidden" download>Baixar Vídeo</a>
         <button id="copy-btn" class="copy-btn hidden">
@@ -167,13 +167,9 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    const formattedDetails = `
-                    Título: ${data.title}
-                    Descrição: ${data.description}
-                    Duração: ${data.duration}
-                    Qualidade: ${data.quality}
-                    `;
-                    videoDetails.textContent = formattedDetails;
+                    // Exibe apenas a descrição se estiver presente
+                    const description = data.description || "Descrição não disponível.";
+                    videoDetails.textContent = `Descrição: ${description}`;
 
                     const videoResponse = await fetch(data.videoUrl);
                     const videoData = await videoResponse.json();
@@ -209,10 +205,10 @@
             }
         });
 
-        // Função para copiar a descrição
+        // Função para copiar apenas a descrição
         document.getElementById("copy-btn").addEventListener("click", function () {
             const videoDetails = document.getElementById("video-details");
-            const descriptionText = videoDetails.textContent.split('\n')[1];  // Pega apenas a linha da descrição
+            const descriptionText = videoDetails.textContent.split('\n')[0];  // Pega apenas a linha da descrição
 
             navigator.clipboard.writeText(descriptionText).then(() => {
                 alert("Descrição copiada para a área de transferência!");
