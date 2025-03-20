@@ -1,32 +1,25 @@
-async function processarUrl() {
+async function baixarVideo() {
     let urlTikTok = document.getElementById("urlInput").value;
 
+    if (!urlTikTok) {
+        alert("Por favor, insira a URL do TikTok.");
+        return;
+    }
+
+    let apiURL = "https://SEU-PROJETO.vercel.app/baixar?url=" + encodeURIComponent(urlTikTok);
+
     try {
-        let response = await fetch("/api/tiktok", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: urlTikTok })
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro na requisição: " + response.status);
-        }
-
+        let response = await fetch(apiURL, { method: "POST" });
         let data = await response.json();
-        let videoUrl = data.api.mediaItems[0].mediaUrl;
 
-        document.getElementById("titulo").innerText = data.api.title;
-        document.getElementById("descricao").innerText = data.api.description;
-        document.getElementById("dataCriacao").innerText = data.api.createdTime;
-        document.getElementById("qualidade").innerText = data.api.mediaItems[0].mediaQuality;
-
-        let downloadBtn = document.getElementById("downloadBtn");
-        downloadBtn.style.display = "inline-block";
-        downloadBtn.onclick = function() {
-            window.open(videoUrl, "_blank");
-        };
-
-        document.getElementById("resultado").style.display = "block";
+        if (data.video_url) {
+            let downloadLink = document.getElementById("downloadLink");
+            downloadLink.href = data.video_url;
+            downloadLink.innerText = "Clique aqui para baixar";
+            document.getElementById("resultado").style.display = "block";
+        } else {
+            alert("Erro ao obter o vídeo. Tente outra URL.");
+        }
     } catch (error) {
         alert("Erro ao processar a URL: " + error.message);
     }
