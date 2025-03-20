@@ -106,7 +106,7 @@
         <p><strong>Nome do Arquivo:</strong> <span id="fileName"></span></p>
         <p><strong>Status:</strong> <span id="percent"></span></p>
         <br>
-        <a id="download-btn" class="download-btn hidden" download>Baixar Vídeo</a>
+        <a id="download-btn" class="download-btn hidden">Baixar Vídeo</a>
     </div>
 
     <script>
@@ -122,27 +122,31 @@
             infoContainer.classList.add("hidden");
             downloadBtn.classList.add("hidden");
 
-            const response = await fetch("/api/tiktok", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url })
-            });
+            try {
+                const response = await fetch("/api/tiktok", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (response.ok) {
-                fileSize.textContent = data.fileSize;
-                fileName.textContent = data.fileName;
-                percent.textContent = data.percent;
-                
-                // Configura o botão de download
-                downloadBtn.href = data.fileUrl; // URL com token
-                downloadBtn.download = data.fileName; // Nome do arquivo correto
-                downloadBtn.classList.remove("hidden");
+                if (response.ok) {
+                    fileSize.textContent = data.fileSize;
+                    fileName.textContent = data.fileName;
+                    percent.textContent = data.percent;
+                    
+                    // Configura o botão de download corretamente
+                    downloadBtn.href = data.fileUrl; // URL do vídeo
+                    downloadBtn.download = data.fileName; // Nome correto do arquivo
+                    downloadBtn.classList.remove("hidden");
 
-                infoContainer.classList.remove("hidden");
-            } else {
-                alert("Erro: " + data.error);
+                    infoContainer.classList.remove("hidden");
+                } else {
+                    alert("Erro: " + data.error);
+                }
+            } catch (error) {
+                alert("Erro ao processar a requisição.");
             }
         });
     </script>
