@@ -14,11 +14,24 @@
 
     <div id="resultado" style="margin-top: 20px;"></div>
 
+    <!-- Área onde o vídeo será carregado -->
+    <div id="video-container" style="margin-top: 20px; display: none;">
+        <h2>Prévia do Vídeo</h2>
+        <iframe id="video-frame" width="400" height="500" style="border: none;"></iframe>
+        <br>
+        <a id="download-link" download>
+            <button style="padding: 10px; margin-top: 10px;">Baixar Vídeo</button>
+        </a>
+    </div>
+
     <script>
         document.getElementById("form").addEventListener("submit", async function(event) {
             event.preventDefault();
             const url = document.getElementById("url").value;
             const resultadoDiv = document.getElementById("resultado");
+            const videoContainer = document.getElementById("video-container");
+            const videoFrame = document.getElementById("video-frame");
+            const downloadLink = document.getElementById("download-link");
 
             resultadoDiv.innerHTML = "Buscando...";
 
@@ -36,12 +49,15 @@
                     <p>${data.description}</p>
                     <p><strong>Qualidade:</strong> ${data.quality}</p>
                     <p><strong>Duração:</strong> ${data.duration} segundos</p>
-                    <a href="${data.videoUrl}" target="_blank">
-                        <button style="padding: 10px;">Baixar Vídeo</button>
-                    </a>
                 `;
+
+                // Exibir vídeo na página
+                videoContainer.style.display = "block";
+                videoFrame.src = data.videoUrl;
+                downloadLink.href = data.videoUrl;
             } else {
                 resultadoDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                videoContainer.style.display = "none";
             }
         });
     </script>
