@@ -15,7 +15,8 @@
         body {
             background-color: #f4f4f4;
             text-align: center;
-            padding: 30px;
+            padding: 20px;
+            font-size: 16px;
         }
 
         .container {
@@ -23,12 +24,15 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            max-width: 100%;
+            width: 500px;
             margin: auto;
         }
 
         h1 {
             color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
         }
 
         input {
@@ -50,13 +54,13 @@
             background: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: left;
-            max-width: 500px;
+            max-width: 100%;
             margin: auto;
-            white-space: pre-wrap; /* Preserve spacing and newlines */
+            white-space: pre-wrap;
             font-family: 'Courier New', Courier, monospace;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
-            overflow-wrap: break-word; /* Ensure long words break and do not overflow */
+            overflow-wrap: break-word;
         }
 
         .download-btn {
@@ -75,6 +79,50 @@
         .download-btn:hover {
             background: #218838;
         }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+
+        .copy-btn i {
+            margin-right: 8px;
+        }
+
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .info-container {
+                padding: 15px;
+            }
+
+            .download-btn {
+                width: 100%;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -83,25 +131,27 @@
         <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
     </div>
 
-    <!-- Exibição dos detalhes -->
     <div id="info-container" class="info-container hidden">
         <h2>Dados do Vídeo</h2>
         <pre id="video-details"></pre>
-        <a id="download-btn" class="download-btn hidden">Baixar Vídeo</a>
+        <a id="download-btn" class="download-btn hidden" download>Baixar Vídeo</a>
+        <button id="copy-btn" class="copy-btn hidden">
+            <i>&#x1F4CB;</i> Copiar Descrição
+        </button>
     </div>
 
     <script>
-        // Função para buscar os dados do vídeo automaticamente
         async function fetchVideoData(url) {
             const infoContainer = document.getElementById("info-container");
             const videoDetails = document.getElementById("video-details");
             const downloadBtn = document.getElementById("download-btn");
+            const copyBtn = document.getElementById("copy-btn");
 
             infoContainer.classList.add("hidden");
             downloadBtn.classList.add("hidden");
+            copyBtn.classList.add("hidden");
 
             try {
-                // Requisição para pegar o 'videoUrl' do TikTok
                 const response = await fetch("/api/tiktok", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -111,7 +161,6 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Exibe os detalhes do vídeo, mas sem a URL do vídeo
                     const formattedDetails = `
                     Título: ${data.title}
                     Descrição: ${data.description}
@@ -120,22 +169,20 @@
                     `;
                     videoDetails.textContent = formattedDetails;
 
-                    // Agora que temos o `videoUrl`, fazemos outra requisição para obter o `fileUrl` e o `fileSize`
                     const videoResponse = await fetch(data.videoUrl);
                     const videoData = await videoResponse.json();
 
                     if (videoResponse.ok) {
-                        // Exibe o link de download
                         const fileUrl = videoData.fileUrl;
-                        const fileSize = videoData.fileSize; // Agora obtemos o fileSize
+                        const fileSize = videoData.fileSize;
                         downloadBtn.href = fileUrl;
-                        downloadBtn.download = videoData.fileName; // Nome do arquivo
-                        
-                        // Atualiza o campo de "Tamanho"
+                        downloadBtn.download = videoData.fileName;
+
                         const updatedDetails = `${videoDetails.textContent}\nTamanho: ${fileSize}`;
                         videoDetails.textContent = updatedDetails;
-                        
+
                         downloadBtn.classList.remove("hidden");
+                        copyBtn.classList.remove("hidden");
                     } else {
                         alert("Erro ao acessar o link do vídeo para o download.");
                     }
@@ -149,14 +196,23 @@
             }
         }
 
-        // Evento de "input" para quando o usuário colar a URL
-        document.getElementById("url").addEventListener("input", function() {
+        document.getElementById("url").addEventListener("input", function () {
             const url = this.value.trim();
-
-            // Se a URL não estiver vazia, chama a função para buscar os dados
             if (url) {
                 fetchVideoData(url);
             }
+        });
+
+        // Função para copiar a descrição
+        document.getElementById("copy-btn").addEventListener("click", function () {
+            const videoDetails = document.getElementById("video-details");
+            const textToCopy = videoDetails.textContent;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("Descrição copiada para a área de transferência!");
+            }, () => {
+                alert("Falha ao copiar a descrição.");
+            });
         });
     </script>
 </body>
