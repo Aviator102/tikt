@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baixar Vídeo do TikTok</title>
-    <!-- Link para o Font Awesome para o ícone de pasta -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -37,31 +36,30 @@
             margin-bottom: 15px;
         }
 
-        .input-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        input {
+        #url {
             width: 85%;
             padding: 10px;
-            margin-right: 10px;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+            display: inline-block;
         }
 
-        .folder-icon {
-            font-size: 20px;
-            cursor: pointer;
+        #folder-icon {
             padding: 10px;
-            background-color: #ddd;
+            background: #28a745;
+            border: none;
+            color: white;
             border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: -5px;
+            margin-top: 10px;
         }
 
-        .folder-icon:hover {
-            background-color: #ccc;
+        #folder-icon i {
+            font-size: 20px;
         }
 
         .info-container {
@@ -165,87 +163,96 @@
 <body>
     <div class="container">
         <h1>Baixar Vídeo do TikTok</h1>
-        <div class="input-container">
-            <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
-            <i class="fas fa-folder folder-icon" id="paste-icon"></i>
-        </div>
+        <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
+        <button id="folder-icon" class="folder-icon">
+            <i class="fas fa-folder"></i>
+        </button>
     </div>
 
     <div id="info-container" class="info-container" style="display: none;">
         <h2>Descrição do Vídeo</h2>
-        <p id="descricao"></p>
-        <p id="tamanho"></p>
-        <button id="download-btn" class="download-btn" style="display: none;">Baixar Vídeo</button>
-        <button id="copy-btn" class="copy-btn" style="display: none;">
-            <i class="fas fa-copy"></i> Copiar Descrição
+        <pre id="video-details"></pre>
+        <a id="download-btn" class="download-btn hidden" download>Baixar Vídeo</a>
+        <button id="copy-btn" class="copy-btn hidden">
+            <i>&#x1F4CB;</i> Copiar Descrição
         </button>
-        <button id="clear-btn" class="clear-btn">Limpar</button>
     </div>
 
-    <script>
-        document.getElementById('paste-icon').addEventListener('click', function() {
-            navigator.clipboard.readText().then(function(text) {
-                document.getElementById('url').value = text;
-                buscarVideo(); // Auto busca após colar
-            }).catch(function(err) {
-                alert('Erro ao colar a URL: ' + err);
-            });
-        });
+    <button id="clear-btn" class="clear-btn hidden">Limpar</button>
 
-        document.getElementById('url').addEventListener('input', function() {
-            if (this.value === '') {
-                document.getElementById('info-container').style.display = 'none';
+    <script>
+        async function fetchVideoData(url) {
+            const infoContainer = document.getElementById("info-container");
+            const videoDetails = document.getElementById("video-details");
+            const downloadBtn = document.getElementById("download-btn");
+            const copyBtn = document.getElementById("copy-btn");
+            const clearBtn = document.getElementById("clear-btn");
+
+            videoDetails.textContent = '';
+            downloadBtn.classList.add("hidden");
+            copyBtn.classList.add("hidden");
+            clearBtn.classList.add("hidden");
+
+            infoContainer.style.display = 'none';
+
+            try {
+                const response = await fetch("/api/tiktok", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const description = data.description || "Descrição não disponível.";
+                    videoDetails.textContent = `Descrição: ${description}`;
+
+                    const videoResponse = await fetch(data.videoUrl);
+                    const videoData = await videoResponse.json();
+
+                    if (videoResponse.ok) {
+                        const fileUrl = videoData.fileUrl;
+                        const fileSize = videoData.fileSize;
+                        downloadBtn.href = fileUrl;
+                        downloadBtn.download = videoData.fileName;
+
+                        const updatedDetails = `${videoDetails.textContent}\nTamanho: ${fileSize}`;
+                        videoDetails.textContent = updatedDetails;
+
+                        downloadBtn.classList.remove("hidden");
+                        copyBtn.classList.remove("hidden");
+                        clearBtn.classList.remove("hidden");
+                    } else {
+                        alert("Erro ao acessar o link do vídeo para o download.");
+                    }
+
+                    infoContainer.style.display = 'block';
+                } else {
+                    alert("Erro: " + data.error);
+                }
+            } catch (error) {
+                alert("Erro ao processar a requisição.");
+            }
+        }
+
+        document.getElementById("url").addEventListener("input", function () {
+            const url = this.value.trim();
+            if (url) {
+                fetchVideoData(url);
             }
         });
 
-        document.getElementById('clear-btn').addEventListener('click', function() {
-            document.getElementById('url').value = '';
-            document.getElementById('info-container').style.display = 'none';
+        document.getElementById("clear-btn").addEventListener("click", function () {
+            document.getElementById("url").value = '';
+            document.getElementById("info-container").style.display = 'none';
+            document.getElementById("clear-btn").classList.add('hidden');
         });
 
-        // Função de buscar o vídeo automaticamente
-        function buscarVideo() {
-            var url = document.getElementById('url').value;
-            if (!url) return;
-            var apiUrl = "https://tikdown.com/proxy.php"; // Seu endpoint de API
-
-            fetch(apiUrl, {
-                method: 'POST',
-                body: new URLSearchParams({ url: url }),
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                var descricao = data.api.description || 'Descrição não disponível';
-                var tamanho = data.api.mediaItems[0].mediaSize || 'Tamanho não disponível';
-                var fileUrl = data.api.mediaItems[0].mediaUrl || '';
-
-                document.getElementById('descricao').textContent = descricao;
-                document.getElementById('tamanho').textContent = 'Tamanho: ' + tamanho;
-
-                // Atualizando o botão de download
-                var downloadBtn = document.getElementById('download-btn');
-                downloadBtn.style.display = 'block';
-                downloadBtn.setAttribute('href', fileUrl);
-                downloadBtn.setAttribute('download', 'video.mp4');
-                
-                // Exibir a seção de informações
-                document.getElementById('info-container').style.display = 'block';
-            })
-            .catch(err => {
-                alert('Erro ao buscar o vídeo: ' + err);
-            });
-        }
-
-        // Copiar a descrição
-        document.getElementById('copy-btn').addEventListener('click', function() {
-            var descricao = document.getElementById('descricao').textContent;
-            navigator.clipboard.writeText(descricao).then(function() {
-                alert('Descrição copiada!');
-            }).catch(function(err) {
-                alert('Erro ao copiar descrição: ' + err);
+        document.getElementById("copy-btn").addEventListener("click", function () {
+            const text = document.getElementById("video-details").textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Descrição copiada para a área de transferência!");
             });
         });
     </script>
