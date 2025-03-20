@@ -95,6 +95,22 @@
             margin-right: 8px;
         }
 
+        .clear-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
         @media screen and (max-width: 600px) {
             body {
                 padding: 10px;
@@ -119,6 +135,10 @@
             .copy-btn {
                 width: 100%;
             }
+
+            .clear-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -137,16 +157,20 @@
         </button>
     </div>
 
+    <button id="clear-btn" class="clear-btn hidden">Limpar</button>
+
     <script>
         async function fetchVideoData(url) {
             const infoContainer = document.getElementById("info-container");
             const videoDetails = document.getElementById("video-details");
             const downloadBtn = document.getElementById("download-btn");
             const copyBtn = document.getElementById("copy-btn");
+            const clearBtn = document.getElementById("clear-btn");
 
             videoDetails.textContent = '';
             downloadBtn.classList.add("hidden");
             copyBtn.classList.add("hidden");
+            clearBtn.classList.add("hidden");
 
             infoContainer.style.display = 'none';
 
@@ -177,6 +201,7 @@
 
                         downloadBtn.classList.remove("hidden");
                         copyBtn.classList.remove("hidden");
+                        clearBtn.classList.remove("hidden");
                     } else {
                         alert("Erro ao acessar o link do vídeo para o download.");
                     }
@@ -197,14 +222,16 @@
             }
         });
 
-        document.getElementById("copy-btn").addEventListener("click", function () {
-            const videoDetails = document.getElementById("video-details");
-            const descriptionText = videoDetails.textContent.split('\n')[0];
+        document.getElementById("clear-btn").addEventListener("click", function () {
+            document.getElementById("url").value = '';
+            document.getElementById("info-container").style.display = 'none';
+            document.getElementById("clear-btn").classList.add('hidden');
+        });
 
-            navigator.clipboard.writeText(descriptionText).then(() => {
+        document.getElementById("copy-btn").addEventListener("click", function () {
+            const text = document.getElementById("video-details").textContent;
+            navigator.clipboard.writeText(text).then(() => {
                 alert("Descrição copiada para a área de transferência!");
-            }, () => {
-                alert("Falha ao copiar a descrição.");
             });
         });
     </script>
