@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baixar Vídeo do TikTok</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
@@ -56,6 +57,11 @@
             display: inline-block;
             margin-left: -5px;
             margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        #folder-icon:hover {
+            background: #218838;
         }
 
         #folder-icon i {
@@ -89,6 +95,7 @@
             text-decoration: none;
             display: block;
             text-align: center;
+            transition: background 0.3s ease;
         }
 
         .download-btn:hover {
@@ -103,6 +110,7 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            transition: background 0.3s ease;
         }
 
         .copy-btn:hover {
@@ -123,6 +131,7 @@
             border-radius: 5px;
             text-align: center;
             width: 100%;
+            transition: background 0.3s ease;
         }
 
         .clear-btn:hover {
@@ -181,6 +190,30 @@
     <button id="clear-btn" class="clear-btn hidden">Limpar</button>
 
     <script>
+        // Função para colar o conteúdo da área de transferência
+        async function pasteFromClipboard() {
+            try {
+                // Verifica se a API está disponível
+                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                    alert("Seu navegador não suporta colar automaticamente. Use Ctrl+V para colar a URL.");
+                    return;
+                }
+
+                // Tenta acessar a área de transferência
+                const text = await navigator.clipboard.readText();
+                const urlInput = document.getElementById("url");
+                urlInput.value = text; // Cola o texto no campo de entrada
+                fetchVideoData(text); // Chama a função para buscar os dados do vídeo
+            } catch (error) {
+                console.error("Erro ao colar:", error);
+                alert("Não foi possível acessar a área de transferência. Verifique as permissões ou cole manualmente.");
+            }
+        }
+
+        // Adiciona o evento de clique ao ícone da pasta
+        document.getElementById("folder-icon").addEventListener("click", pasteFromClipboard);
+
+        // Função para buscar os dados do vídeo
         async function fetchVideoData(url) {
             const infoContainer = document.getElementById("info-container");
             const videoDetails = document.getElementById("video-details");
@@ -236,6 +269,7 @@
             }
         }
 
+        // Evento de input para buscar dados automaticamente
         document.getElementById("url").addEventListener("input", function () {
             const url = this.value.trim();
             if (url) {
@@ -243,12 +277,14 @@
             }
         });
 
+        // Evento de clique para limpar
         document.getElementById("clear-btn").addEventListener("click", function () {
             document.getElementById("url").value = '';
             document.getElementById("info-container").style.display = 'none';
             document.getElementById("clear-btn").classList.add('hidden');
         });
 
+        // Evento de clique para copiar a descrição
         document.getElementById("copy-btn").addEventListener("click", function () {
             const text = document.getElementById("video-details").textContent;
             navigator.clipboard.writeText(text).then(() => {
