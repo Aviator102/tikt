@@ -39,20 +39,6 @@
             border-radius: 5px;
         }
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            background: #ff3b5c;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background: #e6004c;
-        }
-
         .hidden {
             display: none;
         }
@@ -70,6 +56,7 @@
             font-family: 'Courier New', Courier, monospace;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
+            overflow-wrap: break-word; /* Ensure long words break and do not overflow */
         }
 
         .download-btn {
@@ -93,10 +80,7 @@
 <body>
     <div class="container">
         <h1>Baixar Vídeo do TikTok</h1>
-        <form id="form">
-            <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
-            <button type="submit">Buscar</button>
-        </form>
+        <input type="text" id="url" placeholder="Cole a URL do TikTok" required>
     </div>
 
     <!-- Exibição dos detalhes -->
@@ -107,9 +91,8 @@
     </div>
 
     <script>
-        document.getElementById("form").addEventListener("submit", async function(event) {
-            event.preventDefault();
-            const url = document.getElementById("url").value;
+        // Função para buscar os dados do vídeo automaticamente
+        async function fetchVideoData(url) {
             const infoContainer = document.getElementById("info-container");
             const videoDetails = document.getElementById("video-details");
             const downloadBtn = document.getElementById("download-btn");
@@ -134,19 +117,24 @@
                     Descrição: ${data.description}
                     Duração: ${data.duration}
                     Qualidade: ${data.quality}
-                    Tamanho: ${data.fileSize}
                     `;
                     videoDetails.textContent = formattedDetails;
 
-                    // Agora que temos o `videoUrl`, fazemos outra requisição para obter o `fileUrl`
+                    // Agora que temos o `videoUrl`, fazemos outra requisição para obter o `fileUrl` e o `fileSize`
                     const videoResponse = await fetch(data.videoUrl);
                     const videoData = await videoResponse.json();
 
                     if (videoResponse.ok) {
                         // Exibe o link de download
                         const fileUrl = videoData.fileUrl;
+                        const fileSize = videoData.fileSize; // Agora obtemos o fileSize
                         downloadBtn.href = fileUrl;
                         downloadBtn.download = videoData.fileName; // Nome do arquivo
+                        
+                        // Atualiza o campo de "Tamanho"
+                        const updatedDetails = `${videoDetails.textContent}\nTamanho: ${fileSize}`;
+                        videoDetails.textContent = updatedDetails;
+                        
                         downloadBtn.classList.remove("hidden");
                     } else {
                         alert("Erro ao acessar o link do vídeo para o download.");
@@ -158,6 +146,16 @@
                 }
             } catch (error) {
                 alert("Erro ao processar a requisição.");
+            }
+        }
+
+        // Evento de "input" para quando o usuário colar a URL
+        document.getElementById("url").addEventListener("input", function() {
+            const url = this.value.trim();
+
+            // Se a URL não estiver vazia, chama a função para buscar os dados
+            if (url) {
+                fetchVideoData(url);
             }
         });
     </script>
