@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Video Downloader</title>
+    <title>Baixar Vídeos do TikTok</title>
     <script defer src="script.js"></script>
 </head>
 <body>
@@ -11,15 +11,11 @@
     <h2>Digite a URL do TikTok:</h2>
     <input type="text" id="urlInput" placeholder="Cole a URL do TikTok aqui">
     <br>
-    <button onclick="processarUrl()">Processar URL</button>
+    <button onclick="baixarVideo()">Baixar Vídeo</button>
 
     <div id="resultado" style="display: none;">
-        <h3>Detalhes do Vídeo</h3>
-        <p><strong>Título:</strong> <span id="titulo"></span></p>
-        <p><strong>Descrição:</strong> <span id="descricao"></span></p>
-        <p><strong>Data de Criação:</strong> <span id="dataCriacao"></span></p>
-        <p><strong>Qualidade:</strong> <span id="qualidade"></span></p>
-        <button id="downloadBtn" style="display: none;">Baixar Vídeo</button>
+        <h3>Download do Vídeo</h3>
+        <a id="downloadLink" href="#" target="_blank">Clique aqui para baixar</a>
     </div>
 
 </body>
